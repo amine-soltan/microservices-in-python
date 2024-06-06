@@ -58,6 +58,10 @@ def run_scheduler():
     while True:
         schedule.run_pending()
         time.sleep(1)
+        
+@app.route('/')
+def home():
+    return jsonify({"message": "Welcome to the BTC Price Microservice"})
 
 # Endpoint to fetch current BTC price
 @app.route('/current-price', methods=['GET'])
