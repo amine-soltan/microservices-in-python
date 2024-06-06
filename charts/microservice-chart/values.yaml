@@ -1,0 +1,13 @@
+replicaCount: 1
+
+image:
+  repository: aminesoltan/microservice-in-python
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 5000
+
+env:
+  AUTH_TOKEN: "37c9a1b2cf9b1d3a9d87e6be6b37d3a4"
