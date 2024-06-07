@@ -18,7 +18,7 @@ cd microservices-in-python
 
 ```bash
    git clone [https://github.com/amine-soltan/microservices-in-python.git](https://github.com/amine-soltan/microservices-in-python.git)
-   cd microservices-in-python
+   cd microservices-in-python```
 
 2. Build and Push the Docker Image:
 
