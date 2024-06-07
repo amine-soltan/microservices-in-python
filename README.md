@@ -20,8 +20,8 @@
 2. **Build and Push the Docker Image:**
 
 ```sh
-docker build -t your-dockerhub-username/microservice-in-python .
-docker push your-dockerhub-username/microservice-in-python
+docker build -t aminesoltan/microservice-in-python .
+docker push aminesoltan/microservice-in-python:latest
 ```
 
 3. **Start Minikube:**
