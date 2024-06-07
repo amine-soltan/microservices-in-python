@@ -17,41 +17,40 @@
    cd microservices-in-python
 ```
 
-2. Build and Push the Docker Image:
+2. **Build and Push the Docker Image:**
 
-sh
-Copier le code
+```sh
 docker build -t your-dockerhub-username/microservice-in-python .
 docker push your-dockerhub-username/microservice-in-python
+```
 
-3. Start Minikube:
+3. **Start Minikube:**
 
-sh
-Copier le code
+```sh
 minikube start
+```
 
-4. Deploy with Helm:
+4. **Deploy with Helm:**
 
-sh
-Copier le code
+```sh
 helm install microservice-release ./charts/microservice-chart
+```
 
-5. Check Deployment Status:
+5. **Check Deployment Status:**
 
-sh
-Copier le code
+```sh
 kubectl get all
+```
 
-6. Port Forward to Access the Application:
+6. **Port Forward to Access the Application:**
 
-sh
-Copier le code
+```sh
 kubectl port-forward service/microservice-release-service 5000:5000
+```
 
-7. Test the Endpoints:
+7. **Test the Endpoints:**
 
-sh
-Copier le code
+```sh
 curl -H "Authorization: 37c9a1b2cf9b1d3a9d87e6be6b37d3a4" http://localhost:5000/current-price
 curl -H "Authorization: 37c9a1b2cf9b1d3a9d87e6be6b37d3a4" http://localhost:5000/averages
-
+```
