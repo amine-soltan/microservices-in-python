@@ -13,7 +13,7 @@ app = Flask(__name__)
 API_URL = "https://api.coingecko.com/api/v3/simple/price"
 CURRENCIES = ["eur", "czk"]
 DATABASE = 'btc_prices.db'
-AUTH_TOKEN = '37c9a1b2cf9b1d3a9d87e6be6b37d3a4'  # Replace with your actual secure token
+AUTH_TOKEN = '37c9a1b2cf9b1d3a9d87e6be6b37d3a4'  
 
 # Fetch current BTC price in EUR and CZK
 def fetch_current_price():
