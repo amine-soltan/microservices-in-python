@@ -5,9 +5,9 @@
 
 
 ## Prerequisites
-* **Docker:** 
-* **Minikube:** 
-* **Helm:**
+* **Docker** 
+* **Minikube** 
+* **Helm**
   
 ## Steps
 
