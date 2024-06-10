@@ -10,4 +10,5 @@ service:
   port: 5000
 
 env:
-  AUTH_TOKEN: "37c9a1b2cf9b1d3a9d87e6be6b37d3a4"
+  VAULT_TOKEN: "37c9a1b2cf9b1d3a9d87e6be6b37d3a4"  # Replace with your actual Vault token
+

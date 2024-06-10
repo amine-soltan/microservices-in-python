@@ -21,5 +21,18 @@ spec:
           ports:
             - containerPort: 5000
           env:
-            - name: AUTH_TOKEN
-              value: {{ .Values.env.AUTH_TOKEN }}
+            - name: VAULT_ADDR
+              value: "http://127.0.0.1:8200"
+            - name: VAULT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: vault-token
+                  key: VAULT_TOKEN
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: vault-token
+type: Opaque
+data:
+  VAULT_TOKEN: {{ .Values.env.VAULT_TOKEN | b64enc }}

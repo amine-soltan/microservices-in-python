@@ -5,15 +5,29 @@ import sqlite3
 import threading
 import schedule
 import time
+import os
+import hvac
 
 # Initialize Flask app
 app = Flask(__name__)
+
+# Initialize Vault client
+vault_client = hvac.Client(
+    url=os.getenv('VAULT_ADDR', 'http://127.0.0.1:8200'),
+    token=os.getenv('VAULT_TOKEN')  # Ensure the token is set in the environment variables
+)
+
+# Fetch the AUTH_TOKEN from Vault
+def get_vault_secret(path, key):
+    secret = vault_client.secrets.kv.v2.read_secret_version(path=path)
+    return secret['data']['data'][key]
+
+AUTH_TOKEN = get_vault_secret('microservices', 'AUTH_TOKEN')
 
 # Constants for the cryptocurrency API and database
 API_URL = "https://api.coingecko.com/api/v3/simple/price"
 CURRENCIES = ["eur", "czk"]
 DATABASE = 'btc_prices.db'
-AUTH_TOKEN = '37c9a1b2cf9b1d3a9d87e6be6b37d3a4'  # Replace with your actual secure token
 
 # Fetch current BTC price in EUR and CZK
 def fetch_current_price():
@@ -115,7 +129,7 @@ def averages():
 # Authentication function
 def authenticate_request(request):
     token = request.headers.get('Authorization')
-    print("Authorization token: ", token)
+    #print("Authorization token: ", token)
     return token == AUTH_TOKEN
 
 # Main function to initialize database, start scheduler and run Flask app
