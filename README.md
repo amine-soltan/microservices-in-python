@@ -39,6 +39,7 @@ source tutorial-env/bin/activate  # On Windows use `tutorial-env\Scripts\activat
 ```
 
 4. **Start Vault**
+   
 Ensure Vault is running locally. You can start Vault with the development server for testing:
 
 ```bash
@@ -46,6 +47,7 @@ vault server -dev
 ```
 
 5. **Set environment variables**
+   
 Set the VAULT_ADDR and VAULT_TOKEN environment variables:
 For Windows PowerShell:
 
@@ -109,7 +111,7 @@ curl -H "Authorization: your-vault-token" http://localhost:5000/averages
 
 Using Postman:
 
-Open Postman and create a new GET request to http://127.0.0.1:5000/current-price and http://localhost:5000/averages.
-Go to the "Headers" tab.
-Add a new header with the key Authorization and the value set to the token.
+     Open Postman and create a new GET request to http://127.0.0.1:5000/current-price and http://localhost:5000/averages.
+     Go to the "Headers" tab.
+     Add a new header with the key Authorization and the value set to the token.
 
