@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ .Release.Name }}-deployment
+  namespace: {{ .Values.namespace }}  # Custom namespace
   labels:
     app: {{ .Release.Name }}
 spec:
@@ -33,6 +34,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: vault-token
+  namespace: {{ .Values.namespace }}  # Custom namespace
 type: Opaque
 data:
   VAULT_TOKEN: {{ .Values.env.VAULT_TOKEN | b64enc }}
