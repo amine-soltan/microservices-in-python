@@ -19,8 +19,11 @@ vault_client = hvac.Client(
 
 # Fetch the AUTH_TOKEN from Vault
 def get_vault_secret(path, key):
-    secret = vault_client.secrets.kv.v2.read_secret_version(path=path)
-    return secret['data']['data'][key]
+    try:
+        secret = vault_client.secrets.kv.v2.read_secret_version(path=path, raise_on_deleted_version=True)
+        return secret['data']['data'][key]
+    except Exception as e:
+        raise
 
 AUTH_TOKEN = get_vault_secret('microservices', 'AUTH_TOKEN')
 
@@ -45,9 +48,10 @@ def initialize_db():
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute('''CREATE TABLE IF NOT EXISTS prices (
-                      time TIMESTAMP PRIMARY KEY,
-                      eur REAL,
-                      czk REAL)''')
+        time TIMESTAMP PRIMARY KEY,
+        eur REAL,
+        czk REAL
+    )''')
     conn.commit()
     conn.close()
 
@@ -61,18 +65,31 @@ def store_price():
     conn.commit()
     conn.close()
 
+# Delete records older than 12 months
+def delete_old_records():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cutoff_date = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=365)
+    cursor.execute("DELETE FROM prices WHERE time < ?", (cutoff_date,))
+    conn.commit()
+    conn.close()
+
 # Scheduler job to store BTC price every 5 minutes
 def job():
     store_price()
 
-schedule.every(5).minutes.do(job)
+# Scheduler job to delete old records every day
+def cleanup_job():
+    delete_old_records()
 
 # Run the scheduler
 def run_scheduler():
+    schedule.every(5).minutes.do(job)
+    schedule.every().day.at("00:00").do(cleanup_job)
     while True:
         schedule.run_pending()
         time.sleep(1)
-        
+
 @app.route('/')
 def home():
     return jsonify({"message": "Welcome to the BTC Price Microservice"})
@@ -80,9 +97,7 @@ def home():
 # Endpoint to fetch current BTC price
 @app.route('/current-price', methods=['GET'])
 def current_price():
-    print("Received request for current price")
     if not authenticate_request(request):
-        print("Unauthorized request")
         return jsonify({"error": "Unauthorized"}), 401
     prices = fetch_current_price()
     server_time = datetime.datetime.now(datetime.timezone.utc)
@@ -92,7 +107,6 @@ def current_price():
         "client_request_time": datetime.datetime.now(datetime.timezone.utc),
         "server_data_time": server_time
     }
-    print("Response: ", response)
     return jsonify(response)
 
 # Calculate daily and monthly averages
@@ -104,18 +118,16 @@ def calculate_averages():
     cursor.execute("SELECT * FROM prices WHERE time >= datetime('now', '-1 month')")
     monthly_prices = cursor.fetchall()
     conn.close()
-
-    daily_avg = sum([row['eur'] for row in daily_prices]) / len(daily_prices), sum([row['czk'] for row in daily_prices]) / len(daily_prices)
-    monthly_avg = sum([row['eur'] for row in monthly_prices]) / len(monthly_prices), sum([row['czk'] for row in monthly_prices]) / len(monthly_prices)
-
+    daily_avg = (sum([row['eur'] for row in daily_prices]) / len(daily_prices), 
+                 sum([row['czk'] for row in daily_prices]) / len(daily_prices))
+    monthly_avg = (sum([row['eur'] for row in monthly_prices]) / len(monthly_prices), 
+                   sum([row['czk'] for row in monthly_prices]) / len(monthly_prices))
     return daily_avg, monthly_avg
 
 # Endpoint to fetch daily and monthly averages
 @app.route('/averages', methods=['GET'])
 def averages():
-    print("Received request for averages")
     if not authenticate_request(request):
-        print("Unauthorized request")
         return jsonify({"error": "Unauthorized"}), 401
     daily_avg, monthly_avg = calculate_averages()
     response = {
@@ -123,13 +135,11 @@ def averages():
         "monthly_average": {"eur": monthly_avg[0], "czk": monthly_avg[1]},
         "client_request_time": datetime.datetime.now(datetime.timezone.utc)
     }
-    print("Response: ", response)
     return jsonify(response)
 
 # Authentication function
 def authenticate_request(request):
     token = request.headers.get('Authorization')
-    #print("Authorization token: ", token)
     return token == AUTH_TOKEN
 
 # Main function to initialize database, start scheduler and run Flask app
